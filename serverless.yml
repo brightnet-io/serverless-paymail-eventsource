@@ -1,0 +1,102 @@
+service:
+  name: serverless-paymail-eventsource
+
+
+plugins:
+  - serverless-webpack
+  - serverless-offline-sns
+  - serverless-offline
+
+
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  stage: ${opt:stage,'local'}
+  region: ${opt:region, 'ap-southeast-1'}
+  memorySize: 256
+  environment:
+    LOG_LEVEL: ${self:custom.config.LOG_LEVEL}
+
+
+
+
+custom:
+  config:
+    LOG_LEVEL:  ${opt:LOG_LEVEL:'info'}
+    STREAM_ARN: ${opt:STREAM_ARN}
+  webpack:
+    includeModules: true
+    keepOutputDirectory: true
+  serverless-offline-sns:
+    debug: true
+
+
+functions:
+  eventDispatcher:
+    handler: src/dynamoDbStreamHandler.handle
+    role: EventDispatcherFunctionRole
+    events:
+      - stream:
+          type: dynamodb
+          arn: ${self:custom.config.STREAM_ARN}
+    environment:
+      TOPIC_ARN:
+        Ref: EventSourceTopic
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - "sns:Publish"
+        Resource: "arn:aws:sns:*:*:*"
+
+
+
+resources:
+  Resources:
+    EventSourceTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        DisplayName: 'Topic to which serverless-paymail events are published'
+        TopicName: ${self:service}-${self:provider.stage}-topic
+    EventDispatcherFunctionRole:
+      Type: AWS::IAM::Role
+      Properties:
+        Path: /
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
+        Policies:
+          - PolicyName: ${self:provider.stage}-EventDispatcherFunctionRole-policy
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - logs:CreateLogGroup
+                    - logs:CreateLogStream
+                    - logs:PutLogEvents
+                  Resource:
+                    Fn::Join:
+                      - ":"
+                      - - "arn:aws:logs"
+                        - Ref: "AWS::Region"
+                        - Ref: "AWS::AccountId"
+                        - "log-group:/aws/lambda/*:*:*"
+                - Effect: Allow
+                  Action:
+                    - SNS:Publish
+                  Resource:
+                     Ref: EventSourceTopic
+                - Effect: Allow
+                  Action:
+                    - dynamodb:GetRecords
+                    - dynamodb:GetShardIterator
+                    - dynamodb:DescribeStream
+                    - dynamodb:ListStreams
+                  Resource: ${self:custom.config.STREAM_ARN}
+

@@ -1,0 +1,58 @@
+{
+  "name": "serverless-paymail-eventsource",
+  "version": "0.1.0",
+  "description": "",
+  "scripts": {
+    "test": "jest --detectOpenHandles",
+    "tslint": "tslint -c tslint.json './__tests__/**/*.ts' 'src/**/*.ts' ",
+    "tslint:fix": "tslint -c tslint.json './__tests__/**/*.ts' 'src/**/*.ts' --fix"
+  },
+  "author": "awol55 <awol55@brightnet.io>",
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "@types/ajv": "^1.0.0",
+    "@types/aws-lambda": "^8.10.27",
+    "@types/bunyan": "^1.8.6",
+    "@types/jest": "^24.0.18",
+    "@types/node": "^12.0.12",
+    "aws-event-mocks": "git+https://git@github.com/serverless/aws-event-mocks.git#master",
+    "aws-lambda-mock-context": "^3.2.1",
+    "aws-sdk": "^2.489.0",
+    "aws-sdk-mock": "^4.5.0",
+    "jest": "^24.8.0",
+    "serverless-offline": "^5.7.1",
+    "serverless-offline-sns": "^0.53.0",
+    "serverless-webpack": "^5.3.1",
+    "ts-jest": "^24.0.2",
+    "ts-loader": "^6.0.4",
+    "ts-node": "^8.3.0",
+    "tslint": "^5.18.0",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^3.5.2",
+    "webpack": "^4.35.2",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "jest": {
+    "setupFiles": [
+      "./setupJest.ts"
+    ],
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
+  },
+  "dependencies": {
+    "@brightnet/serverless-paymail-eventschemas": "git+https://github.com/brightnet-io/serverless-paymail-eventschemas.git",
+    "ajv": "^6.10.2",
+    "bunyan": "^1.8.12"
+  }
+}
