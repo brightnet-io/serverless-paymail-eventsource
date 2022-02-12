@@ -52,7 +52,7 @@
   },
   "dependencies": {
     "@brightnet/serverless-paymail-eventschemas": "git+https://github.com/brightnet-io/serverless-paymail-eventschemas.git",
-    "ajv": "^6.10.2",
+    "ajv": "^6.12.3",
     "bunyan": "^1.8.12"
   }
 }
